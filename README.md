@@ -240,7 +240,7 @@ Lorsqu’une présence est détectée à moins de 80 cm :
 - **une notification apparaît sur l’iPhone**
 
 ## Aperçu : 
-![Présentation](Assets/IMG_6001.jpg)
+![Présentation](Assets/IMG_6002.jpg)
 ![Présentation](Assets/IMG_2349.jpg)
 
 ---
