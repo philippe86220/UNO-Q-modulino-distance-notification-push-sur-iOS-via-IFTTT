@@ -59,6 +59,9 @@ Notification iPhone
 ## 🚀 1. Code STM32 (Arduino)
 
 ```cpp
+// code C++
+
+
 #include <Arduino.h>
 #include <Arduino_RouterBridge.h>
 #include <Arduino_Modulino.h>
@@ -98,6 +101,10 @@ void loop() {
 ⚠️ Important : remplacez l’URL IFTTT par la vôtre.
 
 ```python
+
+# code Python
+
+
 import time
 import json
 import datetime
@@ -143,29 +150,29 @@ App.run(user_loop=loop)
 
 # Principe du JSON et de la requête HTTP vers IFTTT
 
-Dans ce projet, le cœur Linux de l’Arduino UNO Q envoie une notification vers IFTTT en utilisant une requête HTTP de type POST contenant des données au format JSON.
+Dans ce projet, le cœur Linux de l’Arduino UNO Q envoie une notification vers IFTTT en utilisant une requête HTTP **POST** contenant des données au format **JSON**.
 
-Ce mécanisme permet de transmettre simplement des informations (distance, date, source) vers un service cloud, qui se charge ensuite de notifier l’utilisateur (par exemple sur un iPhone).
+L’objectif est de transmettre des informations (distance, date/heure, source) à un service cloud (IFTTT), qui déclenche ensuite une action (notification iPhone, mail, etc.).
 
 ---
 
-## 1️⃣ Pourquoi utiliser du JSON ?
+## 1. Pourquoi utiliser du JSON
 
-JSON (JavaScript Object Notation) est un format texte standard utilisé pour l’échange de données entre machines.
+JSON (JavaScript Object Notation) est un format texte standard pour échanger des données entre machines.
 
-Ses principaux avantages sont :
-- lisible par un humain,
-- simple à générer,
-- indépendant du langage (Python, C, JavaScript, etc.),
-- largement utilisé par les services web (dont IFTTT).
+Avantages :
+- lisible par un humain
+- simple à générer
+- indépendant du langage (Python, C, JavaScript, etc.)
+- très répandu dans les API web (dont IFTTT)
 
-JSON repose sur des paires **clé / valeur**.
+JSON est une structure de paires **clé / valeur**.
 
+---
 
+## 2. Exemple simple de JSON
 
-Exemple simple de JSON
-
-Voici un exemple de message JSON envoyé à IFTTT :
+Exemple de message envoyé à IFTTT :
 
 ```json
 {
@@ -173,33 +180,86 @@ Voici un exemple de message JSON envoyé à IFTTT :
   "value2": "2025-12-16 11:13:22",
   "value3": "UNO Q"
 }
-
 ```
-## 2️⃣ Ce que fait exactement IFTTT
-IFTTT propose un `Webhook` qui attend :  
-- une requête HTTP POST,
-- vers une URL spécifique,
-- avec un contenu JSON optionnel.
-Format général de l’URL :
-```ruby
+
+---
+
+## 3. Le rôle de IFTTT et des Webhooks
+
+IFTTT propose un service appelé **Webhooks** qui permet de déclencher une action à partir d’une requête HTTP.
+
+Le webhook attend typiquement :
+- une requête HTTP **POST**
+- envoyée vers une **URL spécifique**
+- avec éventuellement un corps JSON
+
+---
+
+## 4. Format de l’URL Webhook IFTTT
+
+Format général :
+
+```text
 https://maker.ifttt.com/trigger/NOM_EVENEMENT/with/key/CLE_SECRETE
 ```
 
-Dans notre cas :  
-- `NOM_EVENEMENT` = `uno-q-presence`
-- `CLE_SECRETE` = clé personnelle IFTTT
+- `NOM_EVENEMENT` : le nom de votre événement IFTTT (celui choisi dans l’applet)
+- `CLE_SECRETE` : votre clé Webhooks personnelle (à garder privée)
 
-## 3️⃣ Le rôle des champs `value1`, `value2`, `value3`
-IFTTT Webhooks accepte jusqu’à **trois valeurs nommées** :
-| Champ    | Utilisation dans le projet |
-| -------- | -------------------------- |
-| `value1` | Distance mesurée           |
-| `value2` | Date et heure              |
-| `value3` | Source de l’événement      |
+---
 
+## 5. Le rôle de value1, value2, value3
 
-## 5️⃣ Envoi de la requête HTTP POST
-La requête est envoyée ainsi :
+IFTTT Webhooks accepte jusqu’à trois champs personnalisés :
+
+- `value1`
+- `value2`
+- `value3`
+
+Ils servent à transporter des informations associées à l’événement. Dans ce projet, par exemple :
+- `value1` : distance mesurée (ex. `"742 mm"`)
+- `value2` : date/heure (ex. `"2025-12-16 11:13:22"`)
+- `value3` : source (ex. `"UNO Q"`)
+
+Dans IFTTT, ces champs sont réutilisables dans les actions via :
+- `{{Value1}}`
+- `{{Value2}}`
+- `{{Value3}}`
+
+---
+
+## 6. Construction du JSON côté Python
+
+En Python, on prépare d’abord un dictionnaire (structure clé/valeur) :
+
+```python
+payload = {
+    "value1": "distance_mm=" + str(mm),
+    "value2": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "value3": "UNO Q"
+}
+```
+
+Puis on le convertit en JSON :
+
+```python
+data = json.dumps(payload).encode("utf-8")
+```
+
+- `json.dumps(...)` transforme le dictionnaire en texte JSON
+- `.encode("utf-8")` transforme ce texte en octets (format attendu par HTTP)
+
+---
+
+## 7. Envoi de la requête HTTP POST
+
+On envoie ensuite la requête HTTP POST avec :
+- l’URL Webhooks IFTTT
+- un header `Content-Type: application/json`
+- le corps JSON (les octets `data`)
+
+Exemple (simplifié) :
+
 ```python
 req = urllib.request.Request(
     IFTTT_URL,
@@ -207,31 +267,32 @@ req = urllib.request.Request(
     headers={"Content-Type": "application/json"},
     method="POST"
 )
-```
-Ce que cela signifie :
-- `data=data` → le corps de la requête contient le JSON
-- `Content-Type`: application/json → on précise le format
-- `POST` → **on envoie des données**
-Puis :
-```python
-urllib.request.urlopen(req)
-```
-➡️ La requête est envoyée sur Internet depuis le cœur Linux de l’UNO Q.
 
-## 6️⃣ Ce qui se passe ensuite
-- IFTTT reçoit la requête
-- Il reconnaît l’événement uno-q-presence
-- Il lit value1, value2, value3
-- Il déclenche l’applet associée
-- L’iPhone reçoit la notification  
-Tout cela se fait en **quelques centaines de millisecondes**.
+with urllib.request.urlopen(req, timeout=10) as r:
+    print("IFTTT status:", r.status)
+```
 
-##  7️⃣ Résumé en une phrase (très utile)
-Le STM32 détecte un événement,    
-le cœur Linux le transforme en message JSON et l’envoie via une requête HTTP sécurisée vers IFTTT,   
-qui notifie ensuite l’iPhone.
+Si tout est correctement configuré, IFTTT répond généralement avec un code HTTP **200**.
 
 ---
+
+## 8. Chaîne complète de fonctionnement
+
+1. Le STM32 détecte une présence via le capteur de distance
+2. Le STM32 envoie l’événement au cœur Linux avec `Bridge.call("presence_mm", mm)`
+3. Le script Python reçoit l’événement via `Bridge.provide("presence_mm", ...)`
+4. Python construit un JSON avec `value1`, `value2`, `value3`
+5. Python envoie un HTTP POST au Webhook IFTTT
+6. IFTTT déclenche l’applet
+7. L’iPhone reçoit la notification
+
+---
+
+## Remarque importante sur la sécurité
+
+Ne publiez pas votre **clé Webhooks** dans un dépôt public.  
+Si une clé a été exposée, régénérez-la dans IFTTT puis mettez à jour l’URL.
+
 
 ## 📱 Résultat attendu
 Lorsqu’une présence est détectée à moins de 80 cm : 
