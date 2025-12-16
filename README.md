@@ -210,7 +210,7 @@ req = urllib.request.Request(
 ```
 Ce que cela signifie :
 - `data=data` → le corps de la requête contient le JSON
-- - `Content-Type`: application/json → on précise le format
+- `Content-Type`: application/json → on précise le format
 - `POST` → **on envoie des données**
 Puis :
 ```python
