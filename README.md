@@ -252,7 +252,7 @@ Ce projet montre une utilisation avancée et réaliste de l’UNO Q, en respecta
 STM32 : capteurs, temps réel
 Linux : réseau, HTTPS, services cloud
 
-##🙏 Remerciements
+##  🙏 Remerciements
 Ce projet a été développé avec l’aide de ChatGPT, pour l’architecture,   
 le débogage et la mise en œuvre complète de la communication STM32 ↔ Linux.
 
