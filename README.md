@@ -239,7 +239,9 @@ Lorsqu’une présence est détectée à moins de 80 cm :
 - le cœur Linux déclenche le webhook
 - **une notification apparaît sur l’iPhone**
 
-
+## Aperçu : 
+![Présentation](Assets/IMG_2338.jpg)
+![Présentation](Assets/IMG_2338.jpg)
 
 ---
 
