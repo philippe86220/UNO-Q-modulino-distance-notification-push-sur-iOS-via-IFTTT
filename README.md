@@ -141,11 +141,105 @@ App.run(user_loop=loop)
 
 ---
 
+# Principe du JSON et de la requête HTTP vers IFTTT
+
+Dans ce projet, le cœur Linux de l’Arduino UNO Q envoie une notification vers IFTTT en utilisant une requête HTTP de type POST contenant des données au format JSON.
+
+Ce mécanisme permet de transmettre simplement des informations (distance, date, source) vers un service cloud, qui se charge ensuite de notifier l’utilisateur (par exemple sur un iPhone).
+
+---
+
+## 1️⃣ Pourquoi utiliser du JSON ?
+
+JSON (JavaScript Object Notation) est un format texte standard utilisé pour l’échange de données entre machines.
+
+Ses principaux avantages sont :
+- lisible par un humain,
+- simple à générer,
+- indépendant du langage (Python, C, JavaScript, etc.),
+- largement utilisé par les services web (dont IFTTT).
+
+JSON repose sur des paires **clé / valeur**.
+
+
+
+Exemple simple de JSON
+
+Voici un exemple de message JSON envoyé à IFTTT :
+
+```json
+{
+  "value1": "distance_mm=742",
+  "value2": "2025-12-16 11:13:22",
+  "value3": "UNO Q"
+}
+
+```
+## 2️⃣ Ce que fait exactement IFTTT
+IFTTT propose un `Webhook` qui attend :  
+- une requête HTTP POST,
+- vers une URL spécifique,
+- avec un contenu JSON optionnel.
+Format général de l’URL :
+```ruby
+https://maker.ifttt.com/trigger/NOM_EVENEMENT/with/key/CLE_SECRETE
+```
+
+Dans notre cas :  
+- `NOM_EVENEMENT` = `uno-q-presence`
+- `CLE_SECRETE` = clé personnelle IFTTT
+
+## 3️⃣ Le rôle des champs `value1`, `value2`, `value3`
+IFTTT Webhooks accepte jusqu’à **trois valeurs nommées** :
+| Champ    | Utilisation dans le projet |
+| -------- | -------------------------- |
+| `value1` | Distance mesurée           |
+| `value2` | Date et heure              |
+| `value3` | Source de l’événement      |
+
+
+## 5️⃣ Envoi de la requête HTTP POST
+La requête est envoyée ainsi :
+```python
+req = urllib.request.Request(
+    IFTTT_URL,
+    data=data,
+    headers={"Content-Type": "application/json"},
+    method="POST"
+)
+```
+Ce que cela signifie :
+- `data=data` → le corps de la requête contient le JSON
+- - `Content-Type`: application/json → on précise le format
+- `POST` → **on envoie des données**
+Puis :
+```python
+urllib.request.urlopen(req)
+```
+➡️ La requête est envoyée sur Internet depuis le cœur Linux de l’UNO Q.
+
+## 6️⃣ Ce qui se passe ensuite
+- IFTTT reçoit la requête
+- Il reconnaît l’événement uno-q-presence
+- Il lit value1, value2, value3
+- Il déclenche l’applet associée
+- L’iPhone reçoit la notification  
+Tout cela se fait en **quelques centaines de millisecondes**.
+
+##  7️⃣ Résumé en une phrase (très utile)
+Le STM32 détecte un événement,    
+le cœur Linux le transforme en message JSON et l’envoie via une requête HTTP sécurisée vers IFTTT,   
+qui notifie ensuite l’iPhone.
+
+---
+
 ## 📱 Résultat attendu
 Lorsqu’une présence est détectée à moins de 80 cm : 
 - le STM32 envoie l’événement
 - le cœur Linux déclenche le webhook
 - **une notification apparaît sur l’iPhone**
+
+
 
 ---
 
