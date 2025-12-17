@@ -301,8 +301,7 @@ Lorsqu’une présence est détectée à moins de 80 cm :
 ---
 
 ## 🔒 Sécurité
-Ne publiez jamais votre clé IFTTT en clair sur un dépôt public.
-Pensez à la régénérer avant toute mise en ligne définitive.
+Ne publiez jamais votre clé IFTTT en clair.
 
 ## 🧩 À propos
 Ce projet montre une utilisation avancée et réaliste de l’UNO Q, en respectant la séparation des rôles :
