@@ -288,12 +288,6 @@ Si tout est correctement configuré, IFTTT répond généralement avec un code H
 
 ---
 
-## Remarque importante sur la sécurité
-
-Ne publiez pas votre **clé Webhooks** dans un dépôt public.  
-Si une clé a été exposée, régénérez-la dans IFTTT puis mettez à jour l’URL.
-
-
 ## 📱 Résultat attendu
 Lorsqu’une présence est détectée à moins de 80 cm : 
 - le STM32 envoie l’événement
