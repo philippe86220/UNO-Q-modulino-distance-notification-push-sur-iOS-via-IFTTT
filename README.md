@@ -47,7 +47,7 @@ Notification iPhone
 ## 📦 Dépendances
 
 ### Côté STM32 (Arduino)
-- Arduino_Modulino
+- Arduino_Modulino et ses dépendances
 - Arduino_RouterBridge
 
 ### Côté Linux (App Lab / Python)
