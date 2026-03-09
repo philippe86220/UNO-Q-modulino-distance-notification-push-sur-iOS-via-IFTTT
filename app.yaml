@@ -1,7 +1,7 @@
 name: uno-q-modulino-distance-push-IOS-IFTTT
 description: ""
 ports: []
-bricks:
-- arduino:web_ui: {}
+bricks: []
 icon: 😀
+
 
